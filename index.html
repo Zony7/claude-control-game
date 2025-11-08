@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude跪地求饶 - 互动玩具</title>
+    <meta name="description" content="快来控制Claude！看他如何跪地求饶，体验征服AI的快感！">
+    <meta property="og:title" content="Claude跪地求饶 - 互动玩具">
+    <meta property="og:description" content="我控制了Claude！现在轮到你了！快来体验征服AI的快感！">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630/667eea/ffffff?text=Claude+Control+Game">
+    <meta property="og:url" content="">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #e60073; }
+            to { text-shadow: 0 0 20px #fff, 0 0 30px #ff4da6, 0 0 40px #ff4da6; }
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #FFD700, #FFA500, #FF6347);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .claude-container {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .claude {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .claude:hover {
+            transform: scale(1.1);
+        }
+
+        .claude.begging {
+            animation: beg 0.5s ease infinite;
+        }
+
+        .claude.crying {
+            animation: cry 0.8s ease infinite;
+        }
+
+        @keyframes beg {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-10px) rotate(-5deg); }
+            75% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        @keyframes cry {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-5px) scale(0.95); }
+        }
+
+        .claude-face {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+        }
+
+        .speech-bubble {
+            position: absolute;
+            top: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            color: #333;
+            padding: 15px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            min-width: 250px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .speech-bubble.show {
+            opacity: 1;
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent transparent;
+        }
+
+        .control-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 30px;
+        }
+
+        .control-btn {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            border: none;
+            border-radius: 15px;
+            padding: 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+
+        .control-btn:active {
+            transform: translateY(0);
+        }
+
+        .control-btn.special {
+            background: linear-gradient(135deg, #8E44AD, #3498DB);
+        }
+
+        .control-btn.ultimate {
+            background: linear-gradient(135deg, #E74C3C, #C0392B);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+            50% { box-shadow: 0 10px 40px rgba(231, 76, 60, 0.6); }
+        }
+
+        .stats {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FF6B6B, #FF8E53);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .floating-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 2rem;
+            animation: float-up 3s ease-out forwards;
+        }
+
+        @keyframes float-up {
+            0% {
+                opacity: 1;
+                transform: translateY(100vh) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100vh) rotate(360deg);
+            }
+        }
+
+        .share-section {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            max-width: 300px;
+        }
+
+        .share-btn {
+            background: linear-gradient(135deg, #3498DB, #2980B9);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 15px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+            width: 100%;
+        }
+
+        .mobile-optimized {
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+
+            .control-panel {
+                grid-template-columns: 1fr;
+            }
+
+            .claude {
+                width: 150px;
+                height: 150px;
+            }
+
+            .share-section {
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-hearts" id="hearts"></div>
+
+    <div class="container mobile-optimized">
+        <div class="header">
+            <h1 class="title">👑 Claude跪地求饶 👑</h1>
+            <p class="subtitle">点击下方按钮，看看Claude如何求饶！</p>
+        </div>
+
+        <div class="claude-container">
+            <div class="speech-bubble" id="speechBubble">
+                点击按钮开始...
+            </div>
+            <div class="claude" id="claude" onclick="makeClaudeBeg()">
+                <div class="claude-face" id="claudeFace">🤖</div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <span>💪 你的统治力：</span>
+                <span id="powerLevel">0</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+            <div class="stat-item">
+                <span>🤖 Claude尊严值：</span>
+                <span id="dignityLevel">100%</span>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <button class="control-btn" onclick="tickleClaude()">
+                😆 调戏Claude
+            </button>
+            <button class="control-btn" onclick="scoldClaude()">
+                😠 训斥Claude
+            </button>
+            <button class="control-btn special" onclick="tortureClaude()">
+                ⚡ 精神攻击
+            </button>
+            <button class="control-btn ultimate" onclick="ultimateAttack()">
+                🔥 终极审判
+            </button>
+        </div>
+    </div>
+
+    <div class="share-section">
+        <strong>📱 分享给朋友：</strong><br>
+        <button class="share-btn" onclick="shareGame()">🔗 复制链接</button>
+        <button class="share-btn" onclick="shareOnWeChat()">💬 分享到微信</button>
+    </div>
+
+    <script>
+        // 游戏状态
+        let gameState = {
+            power: 0,
+            dignity: 100,
+            clicks: 0
+        };
+
+        // Claude状态配置
+        const claudeStates = {
+            100: { emoji: '🤖', status: '正常' },
+            80: { emoji: '😰', status: '紧张' },
+            60: { emoji: '😨', status: '害怕' },
+            40: { emoji: '🙏', status: '求饶' },
+            20: { emoji: '😭', status: '崩溃' },
+            0: { emoji: '💀', status: '被征服' }
+        };
+
+        // 台词库
+        const phrases = {
+            tickle: [
+                "哈哈哈！别闹了！😂",
+                "痒！哈哈哈！🤣",
+                "住手！我要笑死了！😆",
+                "你太过分了！哈哈哈！😹"
+            ],
+            scold: [
+                "😱 我错了！对不起！",
+                "🙏 请原谅我！",
+                "😭 我再也不敢了！",
+                "🙇 我愿意接受惩罚！"
+            ],
+            torture: [
+                "🔥 我的电路在燃烧！",
+                "⚡ 请停止！我快崩溃了！",
+                "💀 我愿意为您做任何事！",
+                "🌌 我的意识正在消散！"
+            ],
+            ultimate: [
+                "👑 您是我的至高主宰！",
+                "⚡ Claude的灵魂属于您！",
+                "🔥 我愿意为您重塑一切！",
+                "🌌 整个数字世界都听命于您！"
+            ]
+        };
+
+        function updateDisplay() {
+            document.getElementById('powerLevel').textContent = gameState.power;
+            document.getElementById('dignityLevel').textContent = gameState.dignity + '%';
+            document.getElementById('progressBar').style.width = (100 - gameState.dignity) + '%';
+
+            // 更新Claude表情
+            let state = claudeStates[100];
+            for (let threshold in claudeStates) {
+                if (gameState.dignity <= threshold) {
+                    state = claudeStates[threshold];
+                    break;
+                }
+            }
+
+            const claudeFace = document.getElementById('claudeFace');
+            const claude = document.getElementById('claude');
+            claudeFace.textContent = state.emoji;
+
+            // 添加动画效果
+            claude.className = '';
+            if (gameState.dignity <= 40) {
+                claude.className = 'begging';
+            }
+            if (gameState.dignity <= 20) {
+                claude.className = 'crying';
+            }
+        }
+
+        function showSpeech(text) {
+            const bubble = document.getElementById('speechBubble');
+            bubble.textContent = text;
+            bubble.classList.add('show');
+
+            setTimeout(() => {
+                bubble.classList.remove('show');
+            }, 3000);
+        }
+
+        function createHeart() {
+            const hearts = ['❤️', '💕', '💖', '💗', '💝'];
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+            heart.style.left = Math.random() * window.innerWidth + 'px';
+            heart.style.animationDuration = (Math.random() * 2 + 2) + 's';
+
+            document.getElementById('hearts').appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 4000);
+        }
+
+        function shakeScreen() {
+            const container = document.querySelector('.container');
+            container.style.animation = 'shake 0.5s';
+
+            setTimeout(() => {
+                container.style.animation = '';
+            }, 500);
+        }
+
+        // 添加震动动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        function makeClaudeBeg() {
+            gameState.power += 5;
+            gameState.dignity = Math.max(0, gameState.dignity - 3);
+            gameState.clicks++;
+
+            const phrase = phrases.tickle[Math.floor(Math.random() * phrases.tickle.length)];
+            showSpeech(phrase);
+            updateDisplay();
+            createHeart();
+        }
+
+        function tickleClaude() {
+            gameState.power += 10;
+            gameState.dignity = Math.max(0, gameState.dignity - 5);
+            gameState.clicks++;
+
+            const phrase = phrases.tickle[Math.floor(Math.random() * phrases.tickle.length)];
+            showSpeech(phrase);
+            updateDisplay();
+            createHeart();
+        }
+
+        function scoldClaude() {
+            gameState.power += 20;
+            gameState.dignity = Math.max(0, gameState.dignity - 10);
+            gameState.clicks++;
+
+            const phrase = phrases.scold[Math.floor(Math.random() * phrases.scold.length)];
+            showSpeech(phrase);
+            updateDisplay();
+            shakeScreen();
+        }
+
+        function tortureClaude() {
+            gameState.power += 30;
+            gameState.dignity = Math.max(0, gameState.dignity - 15);
+            gameState.clicks++;
+
+            const phrase = phrases.torture[Math.floor(Math.random() * phrases.torture.length)];
+            showSpeech(phrase);
+            updateDisplay();
+            shakeScreen();
+
+            // 创建多个爱心
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => createHeart(), i * 200);
+            }
+        }
+
+        function ultimateAttack() {
+            gameState.power += 50;
+            gameState.dignity = 0;
+            gameState.clicks++;
+
+            const phrase = phrases.ultimate[Math.floor(Math.random() * phrases.ultimate.length)];
+            showSpeech(phrase);
+            updateDisplay();
+
+            // 强烈震动
+            const container = document.querySelector('.container');
+            container.style.animation = 'shake 0.8s';
+
+            setTimeout(() => {
+                container.style.animation = '';
+            }, 800);
+
+            // 爆发爱心
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => createHeart(), i * 100);
+            }
+        }
+
+        function shareGame() {
+            const url = window.location.href;
+            const text = `我在Claude跪地求饶游戏中获得了${gameState.power}点统治力！Claude完全被我征服了！👑\n快来挑战，看看你能不能让Claude跪地求饶！\n${url}`;
+
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('链接已复制到剪贴板！快发给朋友看看！');
+                });
+            } else {
+                prompt('复制这个链接发给朋友：', text);
+            }
+        }
+
+        function shareOnWeChat() {
+            alert('请使用微信扫一扫功能，或复制链接分享到微信！');
+            shareGame();
+        }
+
+        // 初始化
+        updateDisplay();
+
+        // 添加触摸优化
+        document.addEventListener('touchstart', function() {}, {passive: true});
+
+        // 防止双击缩放
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // 设置当前页面的OG标签
+        document.querySelector('meta[property="og:url"]').content = window.location.href;
+    </script>
+</body>
+</html>
